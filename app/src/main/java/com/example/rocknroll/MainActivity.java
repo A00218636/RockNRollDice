@@ -43,6 +43,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
 
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,12 +68,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
         sp = getSharedPreferences("MyUserPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+
 
         //Get list data from sp
         //Retrieve the values
-        Set<String> keyValSet = sp.getStringSet("keyValues", Collections.singleton(""));
+        Set<String> defaultSet = new HashSet<>();
+        Set<String> keyValSet = sp.getStringSet("keyValues", defaultSet);
 
         if(!keyValSet.isEmpty()) {
+            diceTypeList.clear();
             diceTypeList.addAll(keyValSet);
         }
 
@@ -107,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 //          int len =  diceTypeList.size();
 //
 //           diceTypeList.set(len + 1, resultsValue);
-          SharedPreferences.Editor editor = sp.edit();
+//          SharedPreferences.Editor editor = sp.edit();
 
           //Save results of the dice throw
            editor.putString("result", resultsValue);
@@ -120,8 +127,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
            editor.putString("customDie", customDieValue);
 
            //Set the values of list
-           Set<String> set = new HashSet<String>();
-           set.addAll(diceTypeList);
+           Set<String> set = new HashSet<String>(diceTypeList);
            editor.putStringSet("keyValues", set);
 
            editor.apply();
@@ -144,16 +150,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
            btnClrCustomDice.setOnClickListener(v -> {
 
-               if(diceTypeList.size()>6) {
-                   for (int j = diceTypeList.size(); j > 6; j--) {
+//               if(diceTypeList.size()>6) {
+//                   for (int j = diceTypeList.size(); j > 6; j--) {
+//
+//                       diceTypeList.remove(j - 1);
+//
+//
+//                   }
+//               }
 
-                       diceTypeList.remove(j - 1);
-
-
-                   }
-               }
-
-               SharedPreferences.Editor editor = sp.edit();
+//               SharedPreferences.Editor editor = sp.edit();
                editor.clear();
                editor.apply();
            });
