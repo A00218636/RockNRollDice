@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="GreenText" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#00FF00</item>
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
+    </style>
+    <style name="RedText" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#E74C3C</item>
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
+    </style>
+    <style name="YellowText" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#F4D03F</item>
+    </style>
+    <style name="MaroonText" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#78281F</item>
+        <item name="android:colorBackground">#E74C3C</item>
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
+    </style>
+    <style name="DarkGreenText" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#0B5345</item>
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
+    </style>
+    <style name="DarkBlueText" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#154360</item>
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
+    </style>
+</resources>

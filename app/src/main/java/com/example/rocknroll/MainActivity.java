@@ -2,21 +2,45 @@ package com.example.rocknroll;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static java.lang.Integer.parseInt;
+
+
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener
 {
-    String[] diceType = { "4", "6", "8", "10", "12","20"};
+
+    List<String> diceTypeList = new ArrayList<>(Arrays.asList("4", "6", "8", "10", "12", "20"));
+
+
     String diceSelected="";
+    String[] customDiceTypeArray = new String[5];
 
     int sideUp=0;
     int i=0;
+
+    Button btnSave, btnAddCustomDie, btnClrCustomDice;
+    TextView resultView, customDieView;
+    SharedPreferences sp;
+    String resultsValue, customDieValue;
+    int lastDicePosition=0;
+
 
 
     @Override
@@ -24,15 +48,115 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
+
+        btnSave =  findViewById(R.id.btnSave);
+        resultView = findViewById(R.id.resultView);
+
+        btnAddCustomDie = findViewById(R.id.btnAddCustomDie);
+
+        customDieView = findViewById(R.id.customDie);
+
+        btnClrCustomDice = findViewById(R.id.btnClearCustomDice);
+
+
+
+
+
+        sp = getSharedPreferences("MyUserPrefs", Context.MODE_PRIVATE);
+
+        //Get list data from sp
+        //Retrieve the values
+        Set<String> keyValSet = sp.getStringSet("keyValues", Collections.singleton(""));
+
+        if(!keyValSet.isEmpty()) {
+            diceTypeList.addAll(keyValSet);
+        }
+
+
         //Getting the instance of Spinner and applying OnItemSelectedListener on it
         Spinner spin = (Spinner) findViewById(R.id.spinner);
         spin.setOnItemSelectedListener(this);
 
         //Creating the ArrayAdapter instance having the country list
-        ArrayAdapter aa = new ArrayAdapter(this,android.R.layout.simple_spinner_item,diceType);
+        ArrayAdapter aa = new ArrayAdapter(this,android.R.layout.simple_spinner_item,diceTypeList);
         aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         //Setting the ArrayAdapter data on the Spinner
         spin.setAdapter(aa);
+
+
+          //Set controls value from shared pref on load of the main activity
+          resultView.setText(sp.getString("result", ""));
+          String lastDieString = sp.getString("lastDicePos", "");
+          if(lastDieString !="") {
+              int posStr = parseInt(lastDieString);
+              spin.setSelection(posStr);
+          }
+
+          String custDieStr = sp.getString("customDie","");
+
+          if(custDieStr !="") {
+              customDieView.setText(custDieStr);
+          }
+
+          //On click of SAVE button
+       btnSave.setOnClickListener(v -> {
+
+           resultsValue = resultView.getText().toString();
+//          int len =  diceTypeList.size();
+//
+//           diceTypeList.set(len + 1, resultsValue);
+          SharedPreferences.Editor editor = sp.edit();
+
+          //Save results of the dice throw
+           editor.putString("result", resultsValue);
+
+
+           editor.putString("lastDicePos", String.valueOf(lastDicePosition));
+
+           //Save custom Die value
+           customDieValue = customDieView.getText().toString();
+           editor.putString("customDie", customDieValue);
+
+           //Set the values of list
+           Set<String> set = new HashSet<String>();
+           set.addAll(diceTypeList);
+           editor.putStringSet("keyValues", set);
+
+           editor.apply();
+           Toast.makeText(MainActivity.this, "Data saved", Toast.LENGTH_LONG).show();
+
+       });
+
+          btnAddCustomDie.setOnClickListener(v -> {
+
+              customDieValue = customDieView.getText().toString();
+              diceTypeList.add(customDieValue);
+//             SharedPreferences.Editor editor = sp.edit();
+//              editor.putString("customDie", customDieValue);
+//              editor.apply();
+//              Toast.makeText(MainActivity.this, "Data saved", Toast.LENGTH_LONG).show();
+
+
+          });
+
+
+           btnClrCustomDice.setOnClickListener(v -> {
+
+               if(diceTypeList.size()>6) {
+                   for (int j = diceTypeList.size(); j > 6; j--) {
+
+                       diceTypeList.remove(j - 1);
+
+
+                   }
+               }
+
+               SharedPreferences.Editor editor = sp.edit();
+               editor.clear();
+               editor.apply();
+           });
 
 
 
@@ -40,19 +164,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        Toast.makeText(getApplicationContext(),diceType[position] , Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), diceTypeList.get(position), Toast.LENGTH_LONG).show();
 
-        diceSelected = diceType[position];
+        diceSelected = diceTypeList.get(position);
+        lastDicePosition = position;
 
-        i=  Integer.parseInt(diceSelected);
+if(diceSelected!="") {
+    i = parseInt(diceSelected);
+}
+
+
 
     }
 
 
     public void rollOnce(View view) {
-        TextView tv =  findViewById(R.id.textView);
+        TextView tv =  findViewById(R.id.resultView);
         tv.setText("Null");
         Die obj = new Die();
+
 
 
         switch (i) {
@@ -80,13 +210,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 tv.setText(String.valueOf(sideUp));
                 break;
 
+
+
+            default:
+                sideUp = obj.RollTheDie(i);
+                tv.setText(String.valueOf(sideUp));
+                break;
         }
+
+
     }
 
     public void rollTwice(View view) {
 
               Die object = new Die();
-        TextView tv =  findViewById(R.id.textView);
+        TextView tv =  findViewById(R.id.resultView);
         String result ="";
         String secondTime = "";
 
@@ -128,6 +266,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     result = result + ", " + String.valueOf(object.RollTheDie(20));
                     tv.setText(result);
                     break;
+
+            default:
+                sideUp =   object.RollTheDie(i);
+                result = String.valueOf(sideUp);
+                result = result + ", " + String.valueOf(object.RollTheDie(i));
+
+                tv.setText(result);
+                break;
             }
     }
 
