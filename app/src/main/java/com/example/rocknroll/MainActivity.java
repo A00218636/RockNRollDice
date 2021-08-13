@@ -26,6 +26,7 @@ import static java.lang.Integer.parseInt;
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener
 {
 
+    //Default list which stores the dice types in spinner.
     List<String> diceTypeList = new ArrayList<>(Arrays.asList("4", "6", "8", "10", "12", "20"));
 
 
@@ -56,23 +57,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         btnSave =  findViewById(R.id.btnSave);
         resultView = findViewById(R.id.resultView);
-
         btnAddCustomDie = findViewById(R.id.btnAddCustomDie);
-
         customDieView = findViewById(R.id.customDie);
-
         btnClrCustomDice = findViewById(R.id.btnClearCustomDice);
 
 
 
 
+        //Instantiate shared preferences to save the values of the user
 
         sp = getSharedPreferences("MyUserPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
 
 
         //Get list data from sp
-        //Retrieve the values
+        //Retrieve the values from shared preferences. Shared preferences use Set collection for storing the
+        //list values. Order will be different as Set doesn't keep the values in order like list.
         Set<String> defaultSet = new HashSet<>();
         Set<String> keyValSet = sp.getStringSet("keyValues", defaultSet);
 
@@ -107,14 +107,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
               customDieView.setText(custDieStr);
           }
 
-          //On click of SAVE button
+          //On click of SAVE button, app saves the current state
        btnSave.setOnClickListener(v -> {
 
            resultsValue = resultView.getText().toString();
-//          int len =  diceTypeList.size();
-//
-//           diceTypeList.set(len + 1, resultsValue);
-//          SharedPreferences.Editor editor = sp.edit();
 
           //Save results of the dice throw
            editor.putString("result", resultsValue);
@@ -135,19 +131,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
        });
 
+          //When user clicks on Add button to add custom type
           btnAddCustomDie.setOnClickListener(v -> {
 
               customDieValue = customDieView.getText().toString();
               diceTypeList.add(customDieValue);
-//             SharedPreferences.Editor editor = sp.edit();
-//              editor.putString("customDie", customDieValue);
-//              editor.apply();
-//              Toast.makeText(MainActivity.this, "Data saved", Toast.LENGTH_LONG).show();
 
 
           });
 
 
+          //To clear the shared preferences
            btnClrCustomDice.setOnClickListener(v -> {
 
 //               if(diceTypeList.size()>6) {
@@ -175,11 +169,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         diceSelected = diceTypeList.get(position);
         lastDicePosition = position;
 
-if(diceSelected!="") {
-    i = parseInt(diceSelected);
-}
+        if(diceSelected!="") {
+            i = parseInt(diceSelected);
+        }
 
+    }
 
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
 
     }
 
@@ -227,6 +224,7 @@ if(diceSelected!="") {
 
     }
 
+    //Triggers when rolled twice
     public void rollTwice(View view) {
 
               Die object = new Die();
@@ -283,10 +281,4 @@ if(diceSelected!="") {
             }
     }
 
-
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
-    }
 }
